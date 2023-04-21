@@ -4,7 +4,7 @@ import ru.practicum.shareit.item.model.Item;
 
 public class ItemMapper {
 
-    public static Item toItem(Long id, Long userId, ItemDto itemDto) {
+    public static Item toItem(long id, long userId, ItemDto itemDto) {
         return new Item(id, itemDto.getName(), itemDto.getDescription(), itemDto.getAvailable(), userId, itemDto.getRequest());
     }
 

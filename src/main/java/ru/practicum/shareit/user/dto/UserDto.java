@@ -12,7 +12,7 @@ import lombok.*;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class UserDto {
 
-    private Long id;
+    private long id;
     @NotBlank
     private String name;
     @NotBlank

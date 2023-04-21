@@ -16,7 +16,7 @@ import javax.validation.constraints.Email;
 @AllArgsConstructor
 @Builder
 public class User {
-    Long id;
+    long id;
     String name;
     @Email String email;
 }

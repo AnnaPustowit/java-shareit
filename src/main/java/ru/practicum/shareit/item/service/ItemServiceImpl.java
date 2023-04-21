@@ -16,27 +16,27 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public ItemDto createItem(Long userId, ItemDto itemDto) {
+    public ItemDto createItem(long userId, ItemDto itemDto) {
         return itemDao.createItem(userId, itemDto);
     }
 
     @Override
-    public ItemDto updateItem(Long userId, Long itemId, ItemDto itemDto) {
+    public ItemDto updateItem(long userId, long itemId, ItemDto itemDto) {
         return itemDao.updateItem(userId, itemId, itemDto);
     }
 
     @Override
-    public Collection<ItemDto> getAllItemsByUsersId(Long userId) {
+    public Collection<ItemDto> getAllItemsByUsersId(long userId) {
         return itemDao.getAllItemsByUsersId(userId);
     }
 
     @Override
-    public ItemDto getItemById(Long userId, Long itemId) {
+    public ItemDto getItemById(long userId, long itemId) {
         return itemDao.getItemById(userId, itemId);
     }
 
     @Override
-    public Collection<ItemDto> searchItem(Long userId, String text) {
+    public Collection<ItemDto> searchItem(long userId, String text) {
         return itemDao.searchItem(userId, text);
     }
 }

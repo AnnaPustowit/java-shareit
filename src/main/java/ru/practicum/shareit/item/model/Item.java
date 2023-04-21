@@ -11,10 +11,10 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class Item {
-    Long id;
+    long id;
     String name;
     String description;
     Boolean available;
-    Long owner;
+    long owner;
     String request;
 }

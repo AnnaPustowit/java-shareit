@@ -19,10 +19,10 @@ public class InMemoryItemDaoImpl implements ItemDao {
     private final UserDao userDao;
     private final Map<Long, Item> items = new HashMap<>();
     private final Map<Long, Set<Long>> listItemsByUsersId = new HashMap<>();
-    private Long counter = 0L;
+    private long counter = 0L;
 
     @Override
-    public ItemDto createItem(Long userId, ItemDto itemDto) {
+    public ItemDto createItem(long userId, ItemDto itemDto) {
         userDao.findUserById(userId);
         validateName(itemDto.getName());
         Item item = ItemMapper.toItem(++counter, userId, itemDto);
@@ -33,7 +33,7 @@ public class InMemoryItemDaoImpl implements ItemDao {
     }
 
     @Override
-    public ItemDto updateItem(Long userId, Long itemId, ItemDto itemDto) {
+    public ItemDto updateItem(long userId, long itemId, ItemDto itemDto) {
         userDao.findUserById(userId);
         validateItem(itemId);
         validate(userId, itemId);
@@ -62,20 +62,20 @@ public class InMemoryItemDaoImpl implements ItemDao {
     }
 
     @Override
-    public Collection<ItemDto> getAllItemsByUsersId(Long userId) {
+    public Collection<ItemDto> getAllItemsByUsersId(long userId) {
         userDao.findUserById(userId);
         return listItemsByUsersId.get(userId).stream().map(items::get).map(ItemMapper::toItemDto).collect(Collectors.toList());
     }
 
     @Override
-    public ItemDto getItemById(Long userId, Long itemId) {
+    public ItemDto getItemById(long userId, long itemId) {
         userDao.findUserById(userId);
         validateItem(itemId);
         return ItemMapper.toItemDto(items.get(itemId));
     }
 
     @Override
-    public Collection<ItemDto> searchItem(Long userId, String text) {
+    public Collection<ItemDto> searchItem(long userId, String text) {
         userDao.findUserById(userId);
         if (text.isEmpty()) {
             return Collections.emptyList();
@@ -83,14 +83,14 @@ public class InMemoryItemDaoImpl implements ItemDao {
         return items.values().stream().filter(item -> item.getAvailable() && (item.getName().toLowerCase().contains(text.toLowerCase()) || item.getDescription().toLowerCase().contains(text.toLowerCase()))).map(ItemMapper::toItemDto).collect(Collectors.toList());
     }
 
-    private void validate(Long userId, Long itemId) {
+    private void validate(long userId, long itemId) {
         Item item = items.get(itemId);
         if (item.getOwner() != userId) {
             throw new NotFoundException("Неверный id пользователя - " + userId);
         }
     }
 
-    private void validateItem(Long id) {
+    private void validateItem(long id) {
         if (!items.containsKey(id)) {
             throw new NotFoundException("Предмет с id : " + id + " не найден");
         }
@@ -102,7 +102,7 @@ public class InMemoryItemDaoImpl implements ItemDao {
         }
     }
 
-    private void addItemToList(Long id, Item item) {
+    private void addItemToList(long id, Item item) {
         Set<Long> itemsList = listItemsByUsersId.getOrDefault(id, new HashSet<>());
         itemsList.add(item.getId());
         listItemsByUsersId.put(id, itemsList);

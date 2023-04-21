@@ -21,7 +21,7 @@ public class InMemoryUserDaoImpl implements UserDao {
 
     private final Map<Long, User> users = new HashMap<>();
     private final Set<String> emails = new HashSet<>();
-    private Long counter = 0L;
+    private long counter = 0L;
 
     @Override
     public UserDto createUser(UserDto userDto) {
@@ -34,7 +34,7 @@ public class InMemoryUserDaoImpl implements UserDao {
     }
 
     @Override
-    public UserDto updateUser(Long id, UserDto user) {
+    public UserDto updateUser(long id, UserDto user) {
         validateUser(id);
         User newUser = users.get(id);
         if (user.getEmail() != null && !newUser.getEmail().equals(user.getEmail())) {
@@ -52,7 +52,7 @@ public class InMemoryUserDaoImpl implements UserDao {
     }
 
     @Override
-    public UserDto findUserById(Long id) {
+    public UserDto findUserById(long id) {
         validateUser(id);
         return toUserDto(users.get(id));
     }
@@ -63,14 +63,14 @@ public class InMemoryUserDaoImpl implements UserDao {
     }
 
     @Override
-    public void deleteUserById(Long id) {
+    public void deleteUserById(long id) {
         validateUser(id);
         emails.remove(users.get(id).getEmail());
         users.remove(id);
         log.info("Удален пользователь с id: {}", id);
     }
 
-    private void validateUser(Long id) {
+    private void validateUser(long id) {
         if (!users.containsKey(id)) {
             throw new NotFoundException("Пользователь с id : " + id + " не найден");
         }

@@ -8,11 +8,11 @@ public interface UserDao {
 
     UserDto createUser(UserDto user);
 
-    UserDto updateUser(Long id, UserDto user);
+    UserDto updateUser(long id, UserDto user);
 
-    UserDto findUserById(Long id);
+    UserDto findUserById(long id);
 
     List<UserDto> getAllUsers();
 
-    void deleteUserById(Long id);
+    void deleteUserById(long id);
 }
