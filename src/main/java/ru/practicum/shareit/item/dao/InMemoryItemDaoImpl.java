@@ -64,9 +64,7 @@ public class InMemoryItemDaoImpl implements ItemDao {
     @Override
     public Collection<ItemDto> getAllItemsByUsersId(Long userId) {
         userDao.findUserById(userId);
-        return listItemsByUsersId.get(userId).stream()
-                .map(items::get)
-                .map(ItemMapper::toItemDto).collect(Collectors.toList());
+        return listItemsByUsersId.get(userId).stream().map(items::get).map(ItemMapper::toItemDto).collect(Collectors.toList());
     }
 
     @Override
@@ -82,12 +80,7 @@ public class InMemoryItemDaoImpl implements ItemDao {
         if (text.isEmpty()) {
             return Collections.emptyList();
         }
-        return items.values().stream()
-                .filter(item -> item.getAvailable() &&
-                        (item.getName().toLowerCase().contains(text.toLowerCase()) ||
-                                item.getDescription().toLowerCase().contains(text.toLowerCase())))
-                .map(ItemMapper::toItemDto)
-                .collect(Collectors.toList());
+        return items.values().stream().filter(item -> item.getAvailable() && (item.getName().toLowerCase().contains(text.toLowerCase()) || item.getDescription().toLowerCase().contains(text.toLowerCase()))).map(ItemMapper::toItemDto).collect(Collectors.toList());
     }
 
     private void validate(Long userId, Long itemId) {

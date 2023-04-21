@@ -18,6 +18,5 @@ import javax.validation.constraints.Email;
 public class User {
     Long id;
     String name;
-    @Email
-    String email;
+    @Email String email;
 }

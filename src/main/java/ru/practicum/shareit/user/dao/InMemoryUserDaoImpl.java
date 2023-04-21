@@ -59,9 +59,7 @@ public class InMemoryUserDaoImpl implements UserDao {
 
     @Override
     public List<UserDto> getAllUsers() {
-        return users.values().stream()
-                .map(UserMapper::toUserDto)
-                .collect(Collectors.toList());
+        return users.values().stream().map(UserMapper::toUserDto).collect(Collectors.toList());
     }
 
     @Override
