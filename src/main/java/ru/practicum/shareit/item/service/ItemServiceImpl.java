@@ -47,7 +47,7 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public ItemDto updateItem(Long userId, Long itemId, ItemDto itemDto) {
         final Item itemUpdate = itemRepository.findById(itemId).orElseThrow(() -> new ValidateEntityException("Вещь с id : " + itemId + " не найдена."));
-        if (userId != itemUpdate.getOwner().getId()) {
+        if (!userId.equals(itemUpdate.getOwner().getId())) {
             throw new ValidateEntityException("Владелец вещи с id : " + userId + " указан не верно.");
         }
         if (itemDto.getName() != null) itemUpdate.setName(itemDto.getName());
