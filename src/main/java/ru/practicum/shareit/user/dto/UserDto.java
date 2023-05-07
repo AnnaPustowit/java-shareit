@@ -5,14 +5,15 @@ import javax.validation.constraints.NotBlank;
 
 import lombok.*;
 
-@AllArgsConstructor
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor(force = true)
+@EqualsAndHashCode
 @ToString
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class UserDto {
 
-    private long id;
+    private Long id;
     @NotBlank
     private String name;
     @NotBlank
