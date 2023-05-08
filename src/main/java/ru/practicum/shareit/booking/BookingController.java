@@ -4,7 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.dto.BookingDto;
-import ru.practicum.shareit.booking.dto.BookingJsonDto;
+import ru.practicum.shareit.booking.dto.BookingInputDto;
 import ru.practicum.shareit.booking.service.BookingService;
 
 import javax.validation.Valid;
@@ -25,7 +25,7 @@ public class BookingController {
     }
 
     @PostMapping
-    public BookingDto createBooking(@RequestHeader("X-Sharer-User-Id") Long userId, @Valid @RequestBody BookingJsonDto bookingJsonDto) {
+    public BookingDto createBooking(@RequestHeader("X-Sharer-User-Id") Long userId, @Valid @RequestBody BookingInputDto bookingJsonDto) {
         BookingDto bookingDto = bookingService.createBooking(bookingJsonDto, userId);
         log.debug("Создана бронь на вещь с id : {}", bookingJsonDto.getItemId());
         return bookingDto;

@@ -18,7 +18,7 @@ public class BookingMapper {
         return bookingDto;
     }
 
-    public static Booking toBooking(BookingJsonDto bookingJsonDto, Item item, User user) {
+    public static Booking toBooking(BookingInputDto bookingJsonDto, Item item, User user) {
         Booking booking = new Booking();
         booking.setEnd(bookingJsonDto.getEnd());
         booking.setStart(bookingJsonDto.getStart());

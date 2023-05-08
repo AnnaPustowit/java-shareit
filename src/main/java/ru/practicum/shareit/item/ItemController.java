@@ -68,14 +68,14 @@ public class ItemController {
 
     @GetMapping("/search")
     public List<ItemDto> searchItems(@RequestParam(value = "text") String text) {
-        if (text == null || text.isBlank()) return Collections.emptyList();
         List<ItemDto> items = itemService.searchItems(text);
         log.debug("Получен список вещей по ключевому слову : {}", text);
         return items;
     }
 
     @PostMapping("/{itemId}/comment")
-    public CommentResponseDto createComment(@RequestHeader("X-Sharer-User-Id") Long userId, @Valid @RequestBody CommentDto commentDto, @PathVariable Long itemId) {
+    public CommentResponseDto createComment(@RequestHeader("X-Sharer-User-Id") Long userId,
+                                            @Valid @RequestBody CommentDto commentDto, @PathVariable Long itemId) {
         CommentResponseDto commentNew = itemService.createComment(userId, commentDto, itemId);
         log.debug("Добавлен новый отзыв для вещи : {}", itemId);
         return commentNew;

@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.BookingState;
 import ru.practicum.shareit.booking.BookingStatus;
 import ru.practicum.shareit.booking.dto.BookingDto;
-import ru.practicum.shareit.booking.dto.BookingJsonDto;
+import ru.practicum.shareit.booking.dto.BookingInputDto;
 import ru.practicum.shareit.booking.dto.BookingMapper;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.repository.BookingRepository;
@@ -34,11 +34,13 @@ public class BookingServiceImpl implements BookingService {
     private final BookingRepository bookingRepository;
 
     @Override
-    public BookingDto createBooking(BookingJsonDto bookingJsonDto, Long userId) {
+    public BookingDto createBooking(BookingInputDto bookingJsonDto, Long userId) {
         validate(bookingJsonDto);
         final long itemId = bookingJsonDto.getItemId();
-        final User user = userRepository.findById(userId).orElseThrow(() -> new ValidateEntityException("Пользователь с id : " + userId + " не найден."));
-        final Item item = itemRepository.findById(itemId).orElseThrow(() -> new ValidateEntityException("Вещь с id : " + itemId + " не найдена."));
+        final User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ValidateEntityException("Пользователь с id : " + userId + " не найден."));
+        final Item item = itemRepository.findById(itemId)
+                .orElseThrow(() -> new ValidateEntityException("Вещь с id : " + itemId + " не найдена."));
         if (!item.getIsAvailable()) throw new NotFoundException("Вещь не доступна для бронирования.");
         final Long id = item.getOwner().getId();
         if (Objects.equals(id, userId)) throw new ValidateEntityException("Бронирование своей же вещи запрещено.");
@@ -48,7 +50,8 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public BookingDto updateBooking(Long bookingId, Long userId, boolean isApproved) {
-        Booking booking = bookingRepository.findById(bookingId).orElseThrow(() -> new ValidateEntityException("Бронирование вещи с id : " + bookingId + " не обнаружено."));
+        Booking booking = bookingRepository.findById(bookingId).
+                orElseThrow(() -> new ValidateEntityException("Бронирование вещи с id : " + bookingId + " не обнаружено."));
         final Long id = booking.getItem().getOwner().getId();
         if (!Objects.equals(id, userId))
             throw new ValidateEntityException("Пользователь с id : " + userId + " не может обновить статус вещи.");
@@ -61,13 +64,17 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public BookingDto findBookingById(Long userId, Long bookingId) {
-        return toBookingDto(bookingRepository.findById(bookingId).filter(b -> Objects.equals(b.getBooker().getId(), userId) || Objects.equals(b.getItem().getOwner().getId(), userId)).orElseThrow(() -> new ValidateEntityException("Бронирование вещи с id : " + bookingId + " не найдено.")));
+        return toBookingDto(bookingRepository.findById(bookingId)
+                .filter(b -> Objects.equals(b.getBooker().getId(), userId) || Objects.equals(b.getItem().getOwner().getId(), userId))
+                .orElseThrow(() -> new ValidateEntityException("Бронирование вещи с id : " + bookingId + " не найдено.")));
     }
 
     @Override
     public List<BookingDto> getAllBookingInfo(Long userId, String state) {
-        final BookingState bookingState = BookingState.from(state).orElseThrow(() -> new NotFoundException("Unknown state: " + state));
-        final User user = userRepository.findById(userId).orElseThrow(() -> new ValidateEntityException("Пользователь с id : " + userId + " не найден."));
+        final BookingState bookingState = BookingState.from(state)
+                .orElseThrow(() -> new NotFoundException("Unknown state: " + state));
+        final User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ValidateEntityException("Пользователь с id : " + userId + " не найден."));
         final LocalDateTime date = LocalDateTime.now();
         final Sort sort = Sort.by("start").descending();
         List<Booking> bookings;
@@ -91,9 +98,13 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public List<BookingDto> getAllOwnerBookingInfo(Long userId, String state) {
-        final BookingState bookingState = BookingState.from(state).orElseThrow(() -> new NotFoundException("Unknown state: " + state));
+        final BookingState bookingState = BookingState.from(state)
+                .orElseThrow(() -> new NotFoundException("Unknown state: " + state));
         final User user = userRepository.findById(userId).orElseThrow(() -> new ValidateEntityException("Пользователь с id : " + userId + " не найден."));
-        final List<Long> itemIdList = itemRepository.findAllByOwnerId(userId).stream().map(Item::getId).collect(Collectors.toList());
+        final List<Long> itemIdList = itemRepository.findAllByOwnerId(userId)
+                .stream()
+                .map(Item::getId)
+                .collect(Collectors.toList());
         final LocalDateTime date = LocalDateTime.now();
         final Sort sort = Sort.by("start").descending();
         List<Booking> bookings;
@@ -112,11 +123,14 @@ public class BookingServiceImpl implements BookingService {
         } else {
             return emptyList();
         }
-        return bookings.stream().map(BookingMapper::toBookingDto).collect(Collectors.toList());
+        return bookings
+                .stream()
+                .map(BookingMapper::toBookingDto)
+                .collect(Collectors.toList());
     }
 
-    private void validate(BookingJsonDto bookingJsonDto) {
-        if (bookingJsonDto.getEnd().isBefore(bookingJsonDto.getStart()) || bookingJsonDto.getEnd().equals(bookingJsonDto.getStart()))
+    private void validate(BookingInputDto bookingInputDto) {
+        if (bookingInputDto.getEnd().isBefore(bookingInputDto.getStart()) || bookingInputDto.getEnd().equals(bookingInputDto.getStart()))
             throw new NotFoundException("Дата окончания бронирования не может быть позже даты старта или начинаться в одно время.");
     }
 }
