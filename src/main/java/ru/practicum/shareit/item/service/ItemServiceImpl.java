@@ -37,8 +37,7 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public ItemDto createItem(Long userId, ItemDto itemDto) {
         final Item item = toItem(itemDto);
-        final User user = userRepository.findById(userId).
-                orElseThrow(() -> new ValidateEntityException("Пользователь с id : " + userId + " не найден."));
+        final User user = userRepository.findById(userId).orElseThrow(() -> new ValidateEntityException("Пользователь с id : " + userId + " не найден."));
         item.setOwner(user);
         return toItemDto(itemRepository.save(item));
     }
@@ -46,8 +45,7 @@ public class ItemServiceImpl implements ItemService {
     @Transactional
     @Override
     public ItemDto updateItem(Long userId, Long itemId, ItemDto itemDto) {
-        final Item itemUpdate = itemRepository.findById(itemId).
-                orElseThrow(() -> new ValidateEntityException("Вещь с id : " + itemId + " не найдена."));
+        final Item itemUpdate = itemRepository.findById(itemId).orElseThrow(() -> new ValidateEntityException("Вещь с id : " + itemId + " не найдена."));
         if (!userId.equals(itemUpdate.getOwner().getId())) {
             throw new ValidateEntityException("Владелец вещи с id : " + userId + " указан не верно.");
         }
@@ -99,14 +97,12 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public CommentResponseDto createComment(Long userId, CommentDto commentDto, Long itemId) {
         final Comment comment = toComment(commentDto);
-        final User author = userRepository.findById(userId).
-                orElseThrow(() -> new ValidateEntityException("Пользователь с id : " + userId + " не найден."));
-        final Item item = itemRepository.findById(itemId).
-                orElseThrow(() -> new ValidateEntityException("Вещь с id : " + itemId + " не найдена."));
-        List<Booking> bookings = bookingRepository.findByItemIdAndEndIsBefore(itemId, comment.getCreated()).
-                stream().
-                filter(booking -> Objects.equals(booking.getBooker().getId(), userId)).
-                collect(Collectors.toList());
+        final User author = userRepository.findById(userId).orElseThrow(() -> new ValidateEntityException("Пользователь с id : " + userId + " не найден."));
+        final Item item = itemRepository.findById(itemId).orElseThrow(() -> new ValidateEntityException("Вещь с id : " + itemId + " не найдена."));
+        List<Booking> bookings = bookingRepository.findByItemIdAndEndIsBefore(itemId, comment.getCreated())
+                .stream()
+                .filter(booking -> Objects.equals(booking.getBooker().getId(), userId))
+                .collect(Collectors.toList());
         if (bookings.isEmpty()) {
             throw new NotFoundException("Пользователь не может оставить отзыв для вещи.");
         }

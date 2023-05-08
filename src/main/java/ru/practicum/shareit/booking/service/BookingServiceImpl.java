@@ -50,8 +50,8 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public BookingDto updateBooking(Long bookingId, Long userId, boolean isApproved) {
-        Booking booking = bookingRepository.findById(bookingId).
-                orElseThrow(() -> new ValidateEntityException("Бронирование вещи с id : " + bookingId + " не обнаружено."));
+        Booking booking = bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new ValidateEntityException("Бронирование вещи с id : " + bookingId + " не обнаружено."));
         final Long id = booking.getItem().getOwner().getId();
         if (!Objects.equals(id, userId))
             throw new ValidateEntityException("Пользователь с id : " + userId + " не может обновить статус вещи.");
@@ -64,9 +64,9 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public BookingDto findBookingById(Long userId, Long bookingId) {
-        return toBookingDto(bookingRepository.findById(bookingId)
-                .filter(b -> Objects.equals(b.getBooker().getId(), userId) || Objects.equals(b.getItem().getOwner().getId(), userId))
-                .orElseThrow(() -> new ValidateEntityException("Бронирование вещи с id : " + bookingId + " не найдено.")));
+        return toBookingDto(bookingRepository.findById(bookingId).
+                filter(b -> Objects.equals(b.getBooker().getId(), userId) || Objects.equals(b.getItem().getOwner().getId(), userId)).
+                orElseThrow(() -> new ValidateEntityException("Бронирование вещи с id : " + bookingId + " не найдено.")));
     }
 
     @Override
@@ -93,7 +93,10 @@ public class BookingServiceImpl implements BookingService {
         } else {
             return emptyList();
         }
-        return bookings.stream().map(BookingMapper::toBookingDto).collect(Collectors.toList());
+        return bookings
+                .stream()
+                .map(BookingMapper::toBookingDto)
+                .collect(Collectors.toList());
     }
 
     @Override
