@@ -64,9 +64,9 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public BookingDto findBookingById(Long userId, Long bookingId) {
-        return toBookingDto(bookingRepository.findById(bookingId).
-                filter(b -> Objects.equals(b.getBooker().getId(), userId) || Objects.equals(b.getItem().getOwner().getId(), userId)).
-                orElseThrow(() -> new ValidateEntityException("Бронирование вещи с id : " + bookingId + " не найдено.")));
+        return toBookingDto(bookingRepository.findById(bookingId)
+                .filter(b -> Objects.equals(b.getBooker().getId(), userId) || Objects.equals(b.getItem().getOwner().getId(), userId))
+                .orElseThrow(() -> new ValidateEntityException("Бронирование вещи с id : " + bookingId + " не найдено.")));
     }
 
     @Override
@@ -101,8 +101,7 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public List<BookingDto> getAllOwnerBookingInfo(Long userId, String state) {
-        final BookingState bookingState = BookingState.from(state)
-                .orElseThrow(() -> new NotFoundException("Unknown state: " + state));
+        final BookingState bookingState = BookingState.from(state).orElseThrow(() -> new NotFoundException("Unknown state: " + state));
         final User user = userRepository.findById(userId).orElseThrow(() -> new ValidateEntityException("Пользователь с id : " + userId + " не найден."));
         final List<Long> itemIdList = itemRepository.findAllByOwnerId(userId)
                 .stream()
