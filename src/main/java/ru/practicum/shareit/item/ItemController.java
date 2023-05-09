@@ -38,14 +38,14 @@ public class ItemController {
     }
 
     @PostMapping
-    public ItemDto createItem(@RequestHeader("X-Sharer-User-Id") Long userId, @RequestBody ItemDto itemDto) {
+    public ItemDto createItem(@RequestHeader("X-Sharer-User-Id") Long userId, @Valid @RequestBody ItemDto itemDto) {
         ItemDto newItemDto = itemService.createItem(userId, itemDto);
         log.debug("Добавлена вещь с id : {}", newItemDto.getId());
         return newItemDto;
     }
 
     @PatchMapping("/{itemId}")
-    public ItemDto updateItem(@RequestHeader("X-Sharer-User-Id") Long userId, @PathVariable Long itemId, @RequestBody ItemDto itemDto) {
+    public ItemDto updateItem(@RequestHeader("X-Sharer-User-Id") Long userId, @Valid @PathVariable Long itemId, @RequestBody ItemDto itemDto) {
         ItemDto newItemDto = itemService.updateItem(userId, itemId, itemDto);
         log.debug("Вещь с id : " + itemId + " обновлена.");
         return newItemDto;
