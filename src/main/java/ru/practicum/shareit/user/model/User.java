@@ -1,11 +1,14 @@
 package ru.practicum.shareit.user.model;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
 import javax.validation.constraints.Email;
+
+import lombok.*;
+
+import javax.persistence.*;
 
 /**
  * TODO Sprint add-controllers.
@@ -14,9 +17,17 @@ import javax.validation.constraints.Email;
 @Getter
 @Setter
 @AllArgsConstructor
-@Builder
+@NoArgsConstructor
+@ToString
+@Entity
+@Table(name = "users")
 public class User {
-    long id;
+    @Id
+    @Column(name = "id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    Long id;
+    @Column(name = "name")
     String name;
+    @Column(name = "email")
     @Email String email;
 }

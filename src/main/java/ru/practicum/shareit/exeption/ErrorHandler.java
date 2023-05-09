@@ -13,21 +13,21 @@ import java.util.Map;
 public class ErrorHandler {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public Map<String, String> handleValidationException(final ValidationException validationException) {
-        log.error("Код ошибки: {}, {}", HttpStatus.BAD_REQUEST, validationException.getMessage());
-        return Map.of("error", validationException.getMessage());
+    public Map<String, String> handleNotFoundException(final NotFoundException exception) {
+        log.error("Код ошибки: {}, {}", HttpStatus.BAD_REQUEST, exception.getMessage());
+        return Map.of("error", exception.getMessage());
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public Map<String, String> handleNotFoundException(final NotFoundException notFoundException) {
-        log.error("Код ошибки: {}, {}", HttpStatus.NOT_FOUND, notFoundException.getMessage());
-        return Map.of("error", notFoundException.getMessage());
+    public Map<String, String> handleValidateEntityException(final ValidateEntityException exception) {
+        log.error("Код ошибки: {}, {}", HttpStatus.NOT_FOUND, exception.getMessage());
+        return Map.of("error", exception.getMessage());
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.CONFLICT)
-    public Map<String, String> handleValidationDuplicateEmailException(final DuplicateEmailException exception) {
+    public Map<String, String> handleValidationException(final ValidationException exception) {
         log.error("Код ошибки: {}, {}", HttpStatus.CONFLICT, exception.getMessage());
         return Map.of("error", exception.getMessage());
     }
