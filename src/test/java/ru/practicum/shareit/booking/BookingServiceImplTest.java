@@ -151,7 +151,7 @@ class BookingServiceImplTest {
     }
 
     @Test
-    void getAllBookingInfo() {
+    void getAllBookingsByBooker() {
         when(bookingRepository.findAllByBookerId(any(), any()))
                 .thenReturn(Page.empty());
 
@@ -164,7 +164,72 @@ class BookingServiceImplTest {
     }
 
     @Test
-    void getAllOwnerBookingInfo() {
+    void getPastBookingsByBooker() {
+        when(bookingRepository.findByBookerIdAndEndIsBefore(any(), any(), any()))
+                .thenReturn(Page.empty());
+
+        List<BookingDto> resultBookingDtoList = bookingService.getAllBookingInfo(1L, "PAST", PageRequest.of(0, 10));
+
+        assertThat(resultBookingDtoList, notNullValue());
+        assertThat("isEmpty", resultBookingDtoList.isEmpty());
+        verify(bookingRepository, times(1)).findByBookerIdAndEndIsBefore(any(), any(), any());
+        verify(userRepository, times(1)).findById(user.getId());
+    }
+
+    @Test
+    void getFutureBookingsByBooker() {
+        when(bookingRepository.findByBookerIdAndStartIsAfter(any(), any(), any()))
+                .thenReturn(Page.empty());
+
+        List<BookingDto> resultBookingDtoList = bookingService.getAllBookingInfo(1L, "FUTURE", PageRequest.of(0, 10));
+
+        assertThat(resultBookingDtoList, notNullValue());
+        assertThat("isEmpty", resultBookingDtoList.isEmpty());
+        verify(bookingRepository, times(1)).findByBookerIdAndStartIsAfter(any(), any(), any());
+        verify(userRepository, times(1)).findById(user.getId());
+    }
+
+    @Test
+    void getCurrentBookingsByBooker() {
+        when(bookingRepository.findByBookerIdAndStartIsBeforeAndEndIsAfter(any(), any(), any(), any()))
+                .thenReturn(Page.empty());
+
+        List<BookingDto> resultBookingDtoList = bookingService.getAllBookingInfo(1L, "CURRENT", PageRequest.of(0, 10));
+
+        assertThat(resultBookingDtoList, notNullValue());
+        assertThat("isEmpty", resultBookingDtoList.isEmpty());
+        verify(bookingRepository, times(1)).findByBookerIdAndStartIsBeforeAndEndIsAfter(any(), any(), any(), any());
+        verify(userRepository, times(1)).findById(user.getId());
+    }
+
+    @Test
+    void getWaitingBookingsByBooker() {
+        when(bookingRepository.findByBookerIdAndStartIsAfterAndStatusIs(any(), any(), any(), any()))
+                .thenReturn(Page.empty());
+
+        List<BookingDto> resultBookingDtoList = bookingService.getAllBookingInfo(1L, "WAITING", PageRequest.of(0, 10));
+
+        assertThat(resultBookingDtoList, notNullValue());
+        assertThat("isEmpty", resultBookingDtoList.isEmpty());
+        verify(bookingRepository, times(1)).findByBookerIdAndStartIsAfterAndStatusIs(any(), any(), any(), any());
+        verify(userRepository, times(1)).findById(user.getId());
+    }
+
+    @Test
+    void getRejectedBookingsByBooker() {
+        when(bookingRepository.findByBookerIdAndStartIsAfterAndStatusIs(any(), any(), any(), any()))
+                .thenReturn(Page.empty());
+
+        List<BookingDto> resultBookingDtoList = bookingService.getAllBookingInfo(1L, "REJECTED", PageRequest.of(0, 10));
+
+        assertThat(resultBookingDtoList, notNullValue());
+        assertThat("isEmpty", resultBookingDtoList.isEmpty());
+        verify(bookingRepository, times(1)).findByBookerIdAndStartIsAfterAndStatusIs(any(), any(), any(), any());
+        verify(userRepository, times(1)).findById(user.getId());
+    }
+
+    @Test
+    void getAllOwnerBookings() {
         when(bookingRepository.findAllByItemIdIn(any(), any()))
                 .thenReturn(Page.empty());
 
@@ -173,6 +238,71 @@ class BookingServiceImplTest {
         assertThat(resultBookingDtoList, notNullValue());
         assertThat("isEmpty", resultBookingDtoList.isEmpty());
         verify(bookingRepository, times(1)).findAllByItemIdIn(any(), any());
+        verify(userRepository, times(1)).findById(user.getId());
+    }
+
+    @Test
+    void getPastOwnerBookings() {
+        when(bookingRepository.findByItemIdInAndEndIsBefore(any(), any(), any()))
+                .thenReturn(Page.empty());
+
+        List<BookingDto> resultBookingDtoList = bookingService.getAllOwnerBookingInfo(1L, "PAST", PageRequest.of(0, 10));
+
+        assertThat(resultBookingDtoList, notNullValue());
+        assertThat("isEmpty", resultBookingDtoList.isEmpty());
+        verify(bookingRepository, times(1)).findByItemIdInAndEndIsBefore(any(), any(), any());
+        verify(userRepository, times(1)).findById(user.getId());
+    }
+
+    @Test
+    void getFutureOwnerBookings() {
+        when(bookingRepository.findByItemIdInAndStartIsAfter(any(), any(), any()))
+                .thenReturn(Page.empty());
+
+        List<BookingDto> resultBookingDtoList = bookingService.getAllOwnerBookingInfo(1L, "FUTURE", PageRequest.of(0, 10));
+
+        assertThat(resultBookingDtoList, notNullValue());
+        assertThat("isEmpty", resultBookingDtoList.isEmpty());
+        verify(bookingRepository, times(1)).findByItemIdInAndStartIsAfter(any(), any(), any());
+        verify(userRepository, times(1)).findById(user.getId());
+    }
+
+    @Test
+    void getCurrentOwnerBookings() {
+        when(bookingRepository.findByItemIdInAndStartIsBeforeAndEndIsAfter(any(), any(), any(), any()))
+                .thenReturn(Page.empty());
+
+        List<BookingDto> resultBookingDtoList = bookingService.getAllOwnerBookingInfo(1L, "CURRENT", PageRequest.of(0, 10));
+
+        assertThat(resultBookingDtoList, notNullValue());
+        assertThat("isEmpty", resultBookingDtoList.isEmpty());
+        verify(bookingRepository, times(1)).findByItemIdInAndStartIsBeforeAndEndIsAfter(any(), any(), any(), any());
+        verify(userRepository, times(1)).findById(user.getId());
+    }
+
+    @Test
+    void getWaitingOwnerBookings() {
+        when(bookingRepository.findByItemIdInAndStartIsAfterAndStatusIs(any(), any(), any(), any()))
+                .thenReturn(Page.empty());
+
+        List<BookingDto> resultBookingDtoList = bookingService.getAllOwnerBookingInfo(1L, "WAITING", PageRequest.of(0, 10));
+
+        assertThat(resultBookingDtoList, notNullValue());
+        assertThat("isEmpty", resultBookingDtoList.isEmpty());
+        verify(bookingRepository, times(1)).findByItemIdInAndStartIsAfterAndStatusIs(any(), any(), any(), any());
+        verify(userRepository, times(1)).findById(user.getId());
+    }
+
+    @Test
+    void getRejectedOwnerBookings() {
+        when(bookingRepository.findByItemIdInAndStartIsAfterAndStatusIs(any(), any(), any(), any()))
+                .thenReturn(Page.empty());
+
+        List<BookingDto> resultBookingDtoList = bookingService.getAllOwnerBookingInfo(1L, "REJECTED", PageRequest.of(0, 10));
+
+        assertThat(resultBookingDtoList, notNullValue());
+        assertThat("isEmpty", resultBookingDtoList.isEmpty());
+        verify(bookingRepository, times(1)).findByItemIdInAndStartIsAfterAndStatusIs(any(), any(), any(), any());
         verify(userRepository, times(1)).findById(user.getId());
     }
 }
