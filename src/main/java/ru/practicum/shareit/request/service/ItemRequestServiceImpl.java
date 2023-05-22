@@ -33,14 +33,16 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     @Override
     @Transactional
     public ItemRequestDto createItemRequest(Long userId, ItemRequestDto itemRequestDto) {
-        final User user = validateUser(userId);
+        final User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ValidateEntityException("Пользователь с id : " + userId + " не найден."));
         final ItemRequest itemRequest = toItemRequest(itemRequestDto, user);
         return toItemRequestDto(itemRequestRepository.save(itemRequest));
     }
 
     @Override
     public List<ItemRequestDto> getAllItemRequestsByOwner(Long userId) {
-        final User user = validateUser(userId);
+        if (!validateUser(userId))
+            throw new ValidateEntityException("Пользователь с id : " + userId + " не найден.");
         final Sort sort = Sort.by("created").descending();
         final List<ItemRequestDto> itemRequestDto = itemRequestRepository.findAllByRequestorId(userId, sort)
                 .stream()
@@ -51,7 +53,8 @@ public class ItemRequestServiceImpl implements ItemRequestService {
 
     @Override
     public List<ItemRequestDto> getAllItemRequests(Long userId, PageRequest page) {
-        final User user = validateUser(userId);
+        if (!validateUser(userId))
+            throw new ValidateEntityException("Пользователь с id : " + userId + " не найден.");
         final List<ItemRequestDto> itemRequestDto = itemRequestRepository.findAllByRequestorIdNot(userId, page)
                 .map(ItemRequestMapper::toItemRequestDto)
                 .getContent();
@@ -60,7 +63,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
 
     @Override
     public ItemRequestDto getItemRequestByRequestId(Long userId, Long requestId) {
-        if (!userRepository.existsById(userId))
+        if (!validateUser(userId))
             throw new ValidateEntityException("Пользователь с id : " + userId + " не найден.");
         final ItemRequestDto itemRequestDto = toItemRequestDto(itemRequestRepository.findById(requestId)
                 .orElseThrow(() -> new ValidateEntityException("Запрос на бронирование вещи не найден.")));
@@ -72,9 +75,8 @@ public class ItemRequestServiceImpl implements ItemRequestService {
         return itemRequestDto;
     }
 
-    private User validateUser(Long userId) {
-        return userRepository.findById(userId)
-                .orElseThrow(() -> new ValidateEntityException("Пользователь с id : " + userId + " не найден."));
+    private boolean validateUser(Long userId) {
+        return userRepository.existsById(userId);
     }
 
     private List<ItemRequestDto> addDataToRequest(List<ItemRequestDto> listItemRequestDto) {
