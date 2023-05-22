@@ -87,11 +87,6 @@ class BookingServiceImplTest {
     }
 
     @Test
-    void updateBooking() {
-
-    }
-
-    @Test
     void updateBookingStateToApproved() {
         Long bookingId = 2L;
         boolean approved = true;
