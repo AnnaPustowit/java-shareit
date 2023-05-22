@@ -6,11 +6,19 @@ import ru.practicum.shareit.user.model.User;
 @NoArgsConstructor
 public class UserMapper {
 
-    public static User toUser(Long id, UserDto userDto) {
-        return new User(id, userDto.getName(), userDto.getEmail());
+    public static User toUser(UserDto userDto) {
+        User user = new User();
+        user.setId(userDto.getId());
+        user.setName(userDto.getName());
+        user.setEmail(userDto.getEmail());
+        return user;
     }
 
     public static UserDto toUserDto(User user) {
-        return new UserDto(user.getId(), user.getName(), user.getEmail());
+        UserDto userDto = new UserDto();
+        userDto.setId(user.getId());
+        userDto.setName(user.getName());
+        userDto.setEmail(user.getEmail());
+        return userDto;
     }
 }
