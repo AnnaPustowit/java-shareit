@@ -1,4 +1,4 @@
-package ru.practicum.shareit.user.service;
+package ru.practicum.shareit.user;
 
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Assertions;
@@ -10,6 +10,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import ru.practicum.shareit.exeption.ValidateEntityException;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.repository.UserRepository;
+import ru.practicum.shareit.user.service.UserService;
+import ru.practicum.shareit.user.service.UserServiceImpl;
 
 import java.util.Collections;
 import java.util.List;

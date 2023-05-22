@@ -1,9 +1,10 @@
-package ru.practicum.shareit.item.dto;
+package ru.practicum.shareit.item;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.json.JsonTest;
 import org.springframework.boot.test.json.JacksonTester;
+import ru.practicum.shareit.item.dto.ItemDto;
 
 import java.io.IOException;
 
