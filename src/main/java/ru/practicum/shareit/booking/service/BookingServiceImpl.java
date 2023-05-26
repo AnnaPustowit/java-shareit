@@ -1,8 +1,9 @@
 package ru.practicum.shareit.booking.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.BookingState;
 import ru.practicum.shareit.booking.BookingStatus;
 import ru.practicum.shareit.booking.dto.BookingDto;
@@ -16,6 +17,7 @@ import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
+import org.springframework.data.domain.Page;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -28,111 +30,119 @@ import static ru.practicum.shareit.booking.dto.BookingMapper.toBookingDto;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class BookingServiceImpl implements BookingService {
     private final ItemRepository itemRepository;
     private final UserRepository userRepository;
     private final BookingRepository bookingRepository;
 
     @Override
-    public BookingDto createBooking(BookingInputDto bookingJsonDto, Long userId) {
-        validate(bookingJsonDto);
-        final long itemId = bookingJsonDto.getItemId();
-        final User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ValidateEntityException("Пользователь с id : " + userId + " не найден."));
+    public BookingDto createBooking(BookingInputDto bookingInputDto, Long userId) {
+        validateDate(bookingInputDto);
+        final Long itemId = bookingInputDto.getItemId();
+        final User user = validateUser(userId);
         final Item item = itemRepository.findById(itemId)
                 .orElseThrow(() -> new ValidateEntityException("Вещь с id : " + itemId + " не найдена."));
-        if (!item.getIsAvailable()) throw new NotFoundException("Вещь не доступна для бронирования.");
+        if (!item.getIsAvailable())
+            throw new NotFoundException("Вещь не доступна для бронирования.");
         final Long id = item.getOwner().getId();
-        if (Objects.equals(id, userId)) throw new ValidateEntityException("Бронирование своей же вещи запрещено.");
-        final Booking booking = toBooking(bookingJsonDto, item, user);
+        if (Objects.equals(id, userId))
+            throw new ValidateEntityException("Бронирование своей же вещи запрещено.");
+        final Booking booking = toBooking(bookingInputDto, item, user);
         return toBookingDto(bookingRepository.save(booking));
     }
 
     @Override
+    @Transactional
     public BookingDto updateBooking(Long bookingId, Long userId, boolean isApproved) {
-        Booking booking = bookingRepository.findById(bookingId)
-                .orElseThrow(() -> new ValidateEntityException("Бронирование вещи с id : " + bookingId + " не обнаружено."));
-        final Long id = booking.getItem().getOwner().getId();
-        if (!Objects.equals(id, userId))
-            throw new ValidateEntityException("Пользователь с id : " + userId + " не может обновить статус вещи.");
+        final User user = validateUser(userId);
+        Booking booking = bookingRepository.findByIdAndItemOwnerId(bookingId, userId)
+                .orElseThrow(() -> new ValidateEntityException("Бронь с id : " + bookingId + " не найдена."));
         if (!booking.getStatus().equals(BookingStatus.WAITING))
-            throw new NotFoundException("Статус запроса должен быть WAITING.");
-        if (isApproved) booking.setStatus(BookingStatus.APPROVED);
-        else booking.setStatus(BookingStatus.REJECTED);
+            throw new NotFoundException("Статус должен быть WAITING.");
+        if (isApproved)
+            booking.setStatus(BookingStatus.APPROVED);
+        else
+            booking.setStatus(BookingStatus.REJECTED);
         return toBookingDto(bookingRepository.save(booking));
     }
 
     @Override
-    public BookingDto findBookingById(Long userId, Long bookingId) {
+    public BookingDto getBookingById(Long userId, Long bookingId) {
+        final User user = validateUser(userId);
         return toBookingDto(bookingRepository.findById(bookingId)
                 .filter(b -> Objects.equals(b.getBooker().getId(), userId) || Objects.equals(b.getItem().getOwner().getId(), userId))
                 .orElseThrow(() -> new ValidateEntityException("Бронирование вещи с id : " + bookingId + " не найдено.")));
     }
 
     @Override
-    public List<BookingDto> getAllBookingInfo(Long userId, String state) {
+    public List<BookingDto> getAllBookingInfo(Long userId, String state, PageRequest page) {
         final BookingState bookingState = BookingState.from(state)
                 .orElseThrow(() -> new NotFoundException("Unknown state: " + state));
-        final User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ValidateEntityException("Пользователь с id : " + userId + " не найден."));
+        final User user = validateUser(userId);
         final LocalDateTime date = LocalDateTime.now();
-        final Sort sort = Sort.by("start").descending();
-        List<Booking> bookings;
+        Page<Booking> bookings;
         if (bookingState.equals(BookingState.ALL)) {
-            bookings = bookingRepository.findAllByBookerId(userId, sort);
+            bookings = bookingRepository.findAllByBookerId(userId, page);
         } else if (bookingState.equals(BookingState.CURRENT)) {
-            bookings = bookingRepository.findByBookerIdAndStartIsBeforeAndEndIsAfter(userId, date, date, sort);
+            bookings = bookingRepository.findByBookerIdAndStartIsBeforeAndEndIsAfter(userId, date, date, page);
         } else if (bookingState.equals(BookingState.PAST)) {
-            bookings = bookingRepository.findByBookerIdAndEndIsBefore(userId, date, sort);
+            bookings = bookingRepository.findByBookerIdAndEndIsBefore(userId, date, page);
         } else if (bookingState.equals(BookingState.FUTURE)) {
-            bookings = bookingRepository.findByBookerIdAndStartIsAfter(userId, date, sort);
+            bookings = bookingRepository.findByBookerIdAndStartIsAfter(userId, date, page);
         } else if (bookingState.equals(BookingState.WAITING)) {
-            bookings = bookingRepository.findByBookerIdAndStartIsAfterAndStatusIs(userId, date, sort, BookingStatus.WAITING);
+            bookings = bookingRepository.findByBookerIdAndStartIsAfterAndStatusIs(userId, date, BookingStatus.WAITING, page);
         } else if (bookingState.equals(BookingState.REJECTED)) {
-            bookings = bookingRepository.findByBookerIdAndStartIsAfterAndStatusIs(userId, date, sort, BookingStatus.REJECTED);
+            bookings = bookingRepository.findByBookerIdAndStartIsAfterAndStatusIs(userId, date, BookingStatus.REJECTED, page);
         } else {
             return emptyList();
         }
         return bookings
-                .stream()
                 .map(BookingMapper::toBookingDto)
-                .collect(Collectors.toList());
+                .getContent();
+
     }
 
     @Override
-    public List<BookingDto> getAllOwnerBookingInfo(Long userId, String state) {
-        final BookingState bookingState = BookingState.from(state).orElseThrow(() -> new NotFoundException("Unknown state: " + state));
-        final User user = userRepository.findById(userId).orElseThrow(() -> new ValidateEntityException("Пользователь с id : " + userId + " не найден."));
+    public List<BookingDto> getAllOwnerBookingInfo(Long userId, String state, PageRequest page) {
+        final BookingState bookingState = BookingState.from(state)
+                .orElseThrow(() -> new NotFoundException("Unknown state: " + state));
+        final User user = validateUser(userId);
         final List<Long> itemIdList = itemRepository.findAllByOwnerId(userId)
                 .stream()
                 .map(Item::getId)
                 .collect(Collectors.toList());
         final LocalDateTime date = LocalDateTime.now();
-        final Sort sort = Sort.by("start").descending();
-        List<Booking> bookings;
+        Page<Booking> bookings;
         if (bookingState.equals(BookingState.ALL)) {
-            bookings = bookingRepository.findAllByItemIdIn(itemIdList, sort);
+            bookings = bookingRepository.findAllByItemIdIn(itemIdList, page);
         } else if (bookingState.equals(BookingState.CURRENT)) {
-            bookings = bookingRepository.findByItemIdInAndStartIsBeforeAndEndIsAfter(itemIdList, date, date, sort);
+            bookings = bookingRepository.findByItemIdInAndStartIsBeforeAndEndIsAfter(itemIdList, date, date, page);
         } else if (bookingState.equals(BookingState.PAST)) {
-            bookings = bookingRepository.findByItemIdInAndEndIsBefore(itemIdList, date, sort);
+            bookings = bookingRepository.findByItemIdInAndEndIsBefore(itemIdList, date, page);
         } else if (bookingState.equals(BookingState.FUTURE)) {
-            bookings = bookingRepository.findByItemIdInAndStartIsAfter(itemIdList, date, sort);
+            bookings = bookingRepository.findByItemIdInAndStartIsAfter(itemIdList, date, page);
         } else if (bookingState.equals(BookingState.WAITING)) {
-            bookings = bookingRepository.findByItemIdInAndStartIsAfterAndStatusIs(itemIdList, date, sort, BookingStatus.WAITING);
+            bookings = bookingRepository.findByItemIdInAndStartIsAfterAndStatusIs(itemIdList, date, BookingStatus.WAITING, page);
         } else if (bookingState.equals(BookingState.REJECTED)) {
-            bookings = bookingRepository.findByItemIdInAndStartIsAfterAndStatusIs(itemIdList, date, sort, BookingStatus.REJECTED);
+            bookings = bookingRepository.findByItemIdInAndStartIsAfterAndStatusIs(itemIdList, date, BookingStatus.REJECTED, page);
         } else {
             return emptyList();
         }
         return bookings
-                .stream()
                 .map(BookingMapper::toBookingDto)
-                .collect(Collectors.toList());
+                .getContent();
     }
 
-    private void validate(BookingInputDto bookingInputDto) {
+    private void validateDate(BookingInputDto bookingInputDto) {
         if (bookingInputDto.getEnd().isBefore(bookingInputDto.getStart()) || bookingInputDto.getEnd().equals(bookingInputDto.getStart()))
             throw new NotFoundException("Дата окончания бронирования не может быть позже даты старта или начинаться в одно время.");
     }
+
+    private User validateUser(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new ValidateEntityException("Пользователь с id : " + userId + " не найден."));
+    }
 }
+
+

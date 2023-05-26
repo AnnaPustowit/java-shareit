@@ -26,13 +26,13 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto createUser(UserDto userDto) {
         Long userId = userDto.getId();
-        return toUserDto(userRepository.save(toUser(userId, userDto)));
+        return toUserDto(userRepository.save(toUser(userDto)));
     }
 
     @Transactional
     @Override
     public UserDto updateUser(Long id, UserDto userDto) {
-        User userToUpdate = toUser(id, userDto);
+        User userToUpdate = toUser(userDto);
         userToUpdate.setId(id);
         User userData = userRepository.findById(id).orElseThrow(() -> new ValidateEntityException("Пользователь с id : " + id + " не найден"));
         if (userToUpdate.getName() == null) {
@@ -46,7 +46,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDto findUserById(Long id) {
+    public UserDto getUserById(Long id) {
         Optional<User> user = userRepository.findById(id);
         return toUserDto(user.orElseThrow(() -> new ValidateEntityException("Пользователь с id : " + id + " не найден")));
     }
