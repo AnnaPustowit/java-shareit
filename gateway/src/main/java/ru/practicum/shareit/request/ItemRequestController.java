@@ -18,6 +18,7 @@ import javax.validation.constraints.PositiveOrZero;
 @Validated
 public class ItemRequestController {
     private final ItemRequestClient itemRequestClient;
+
     @PostMapping
     public ResponseEntity<Object> createItemRequest(@RequestHeader("X-Sharer-User-Id") Long userId,
                                                     @Valid @RequestBody ItemRequestDto itemRequestDto) {
@@ -33,15 +34,15 @@ public class ItemRequestController {
 
     @GetMapping("/all")
     public ResponseEntity<Object> getAllItemRequests(@RequestHeader("X-Sharer-User-Id") Long userId,
-                                                   @PositiveOrZero @RequestParam(value = "from", defaultValue = "0") Integer from,
-                                                   @Positive @RequestParam(value = "size", defaultValue = "10") Integer size) {
+                                                     @PositiveOrZero @RequestParam(value = "from", defaultValue = "0") Integer from,
+                                                     @Positive @RequestParam(value = "size", defaultValue = "10") Integer size) {
         log.debug("Получен список всех запросов для пользователя: {}", userId);
         return itemRequestClient.getAllItemRequests(userId, from, size);
     }
 
     @GetMapping("/{requestId}")
     public ResponseEntity<Object> getItemRequestByRequestId(@RequestHeader("X-Sharer-User-Id") Long userId,
-                                                    @PathVariable Long requestId) {
+                                                            @PathVariable Long requestId) {
         log.debug("Получен запрос на бронирование: {}", requestId);
         return itemRequestClient.getItemRequestByRequestId(userId, requestId);
     }

@@ -37,15 +37,15 @@ public class ItemController {
 
     @GetMapping("/{itemId}")
     public ResponseEntity<Object> getItemById(@RequestHeader("X-Sharer-User-Id") Long userId,
-                                          @PathVariable Long itemId) {
+                                              @PathVariable Long itemId) {
         log.info("Получение вещи с id : {}", itemId);
         return itemClient.getItemById(userId, itemId);
     }
 
     @GetMapping
     public ResponseEntity<Object> getAllItems(@RequestHeader("X-Sharer-User-Id") Long userId,
-                                           @PositiveOrZero @RequestParam(value = "from", defaultValue = "0") Integer from,
-                                           @Positive @RequestParam(value = "size", defaultValue = "10") Integer size) {
+                                              @PositiveOrZero @RequestParam(value = "from", defaultValue = "0") Integer from,
+                                              @Positive @RequestParam(value = "size", defaultValue = "10") Integer size) {
         log.info("Получение списка всех вещей пользователя с id: {}", userId);
         return itemClient.getAllItems(userId, from, size);
     }

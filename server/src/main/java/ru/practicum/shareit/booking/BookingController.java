@@ -31,7 +31,7 @@ public class BookingController {
 
     @PostMapping
     public BookingDto createBooking(@RequestHeader("X-Sharer-User-Id") Long userId,
-                                    /*@Valid*/ @RequestBody BookingInputDto bookingJsonDto) {
+            /*@Valid*/ @RequestBody BookingInputDto bookingJsonDto) {
         BookingDto bookingDto = bookingService.createBooking(bookingJsonDto, userId);
         log.debug("Создана бронь на вещь с id : {}", bookingJsonDto.getItemId());
         return bookingDto;
@@ -58,8 +58,8 @@ public class BookingController {
     @GetMapping
     public List<BookingDto> getAllBookingInfo(@RequestHeader("X-Sharer-User-Id") Long userId,
                                               @RequestParam(value = "state", defaultValue = "ALL", required = false) String state,
-                                              /*@PositiveOrZero*/ @RequestParam(value = "from", defaultValue = "0") Integer from,
-                                              /*@Positive*/ @RequestParam(value = "size", defaultValue = "10") Integer size) {
+            /*@PositiveOrZero*/ @RequestParam(value = "from", defaultValue = "0") Integer from,
+            /*@Positive*/ @RequestParam(value = "size", defaultValue = "10") Integer size) {
         final PageRequest page = PageRequest.of(from > 0 ? from / size : 0, size, sort);
         List<BookingDto> bookingDtoList = bookingService.getAllBookingInfo(userId, state, page);
         log.debug("Получен список бронирований пользователя с id : {}", userId);
@@ -69,8 +69,8 @@ public class BookingController {
     @GetMapping("/owner")
     public List<BookingDto> getAllOwnerBookingInfo(@RequestHeader("X-Sharer-User-Id") Long userId,
                                                    @RequestParam(value = "state", defaultValue = "ALL", required = false) String state,
-                                                   /*@PositiveOrZero*/ @RequestParam(value = "from", defaultValue = "0") Integer from,
-                                                   /*@Positive*/ @RequestParam(value = "size", defaultValue = "10") Integer size) {
+            /*@PositiveOrZero*/ @RequestParam(value = "from", defaultValue = "0") Integer from,
+            /*@Positive*/ @RequestParam(value = "size", defaultValue = "10") Integer size) {
         final PageRequest page = PageRequest.of(from > 0 ? from / size : 0, size, sort);
         List<BookingDto> bookingDtoList = bookingService.getAllOwnerBookingInfo(userId, state, page);
         log.debug("Получен список бронирований для вещей пользователя с id : {}", userId);

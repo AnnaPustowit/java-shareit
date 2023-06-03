@@ -27,7 +27,7 @@ public class ItemRequestController {
 
     @PostMapping
     public ItemRequestDto createItemRequest(@RequestHeader("X-Sharer-User-Id") Long userId,
-                                            /*@Valid*/ @RequestBody ItemRequestDto itemRequestDto) {
+            /*@Valid*/ @RequestBody ItemRequestDto itemRequestDto) {
         final ItemRequestDto itemRequestDtoNew = itemRequestDtoService.createItemRequest(userId, itemRequestDto);
         log.debug("Создан запрос на бронирование вещи с описание: {}", itemRequestDto.getDescription());
         return itemRequestDtoNew;
@@ -42,8 +42,8 @@ public class ItemRequestController {
 
     @GetMapping("/all")
     public List<ItemRequestDto> getAllItemRequests(@RequestHeader("X-Sharer-User-Id") Long userId,
-                                                   /*@PositiveOrZero*/ @RequestParam(value = "from", defaultValue = "0") Integer from,
-                                                   /*@Positive*/ @RequestParam(value = "size", defaultValue = "10") Integer size) {
+            /*@PositiveOrZero*/ @RequestParam(value = "from", defaultValue = "0") Integer from,
+            /*@Positive*/ @RequestParam(value = "size", defaultValue = "10") Integer size) {
         final Sort sort = Sort.by("created").descending();
         final PageRequest page = PageRequest.of(from > 0 ? from / size : 0, size, sort);
         final List<ItemRequestDto> itemRequestDto = itemRequestDtoService.getAllItemRequests(userId, page);
