@@ -17,7 +17,7 @@ import static ru.practicum.shareit.user.dto.UserMapper.toUser;
 import static ru.practicum.shareit.user.dto.UserMapper.toUserDto;
 
 @Service
-@Transactional(readOnly = true)
+// @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 

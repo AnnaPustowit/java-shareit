@@ -24,7 +24,7 @@ import static ru.practicum.shareit.request.dto.ItemRequestMapper.toItemRequestDt
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
+// @Transactional(readOnly = true)
 public class ItemRequestServiceImpl implements ItemRequestService {
     private final ItemRequestRepository itemRequestRepository;
     private final UserRepository userRepository;

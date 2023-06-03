@@ -30,7 +30,7 @@ import static ru.practicum.shareit.booking.dto.BookingMapper.toBookingDto;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
+//@Transactional(readOnly = true)
 public class BookingServiceImpl implements BookingService {
     private final ItemRepository itemRepository;
     private final UserRepository userRepository;

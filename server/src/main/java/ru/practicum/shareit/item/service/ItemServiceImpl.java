@@ -30,7 +30,7 @@ import static ru.practicum.shareit.item.dto.ItemMapper.*;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
+// @Transactional(readOnly = true)
 public class ItemServiceImpl implements ItemService {
     private final ItemRepository itemRepository;
     private final UserRepository userRepository;

@@ -46,4 +46,23 @@ public class BookingController {
         log.info("Get booking {}, userId={}", bookingId, userId);
         return bookingClient.getBooking(userId, bookingId);
     }
+
+    @PatchMapping("/{bookingId}")
+    public ResponseEntity<Object> updateBooking(@RequestHeader("X-Sharer-User-Id") Long userId,
+                                                @PathVariable Long bookingId,
+                                                @RequestParam(value = "approved") String approved) {
+        boolean isApproved = approved.equals("true");
+        log.info("Получен запрос на обновление бронирования с id: {}", bookingId);
+        return bookingClient.updateBooking(userId, bookingId, isApproved);
+    }
+    @GetMapping("/owner")
+    public ResponseEntity<Object> getBookingsByOwner(@RequestHeader("X-Sharer-User-Id") long ownerId,
+                                                     @RequestParam(name = "state", defaultValue = "all") String stateParam,
+                                                     @PositiveOrZero @RequestParam(name = "from", defaultValue = "0") Integer from,
+                                                     @Positive @RequestParam(name = "size", defaultValue = "10") Integer size) {
+        BookingState state = ru.practicum.shareit.booking.dto.BookingState.from(stateParam)
+                .orElseThrow(() -> new IllegalArgumentException("Unknown state: " + stateParam));
+        log.info("Get booking with state {}, userId={}, from={}, size={}", stateParam, ownerId, from, size);
+        return bookingClient.getBookingsByOwner(ownerId, state, from, size);
+    }
 }
