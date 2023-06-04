@@ -4,14 +4,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
 import ru.practicum.shareit.request.service.ItemRequestService;
 
-import javax.validation.Valid;
-import javax.validation.constraints.Positive;
-import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
 /**
@@ -21,13 +17,12 @@ import java.util.List;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping(path = "/requests")
-//@Validated
 public class ItemRequestController {
     private final ItemRequestService itemRequestDtoService;
 
     @PostMapping
     public ItemRequestDto createItemRequest(@RequestHeader("X-Sharer-User-Id") Long userId,
-            /*@Valid*/ @RequestBody ItemRequestDto itemRequestDto) {
+                                            @RequestBody ItemRequestDto itemRequestDto) {
         final ItemRequestDto itemRequestDtoNew = itemRequestDtoService.createItemRequest(userId, itemRequestDto);
         log.debug("Создан запрос на бронирование вещи с описание: {}", itemRequestDto.getDescription());
         return itemRequestDtoNew;
@@ -42,8 +37,8 @@ public class ItemRequestController {
 
     @GetMapping("/all")
     public List<ItemRequestDto> getAllItemRequests(@RequestHeader("X-Sharer-User-Id") Long userId,
-            /*@PositiveOrZero*/ @RequestParam(value = "from", defaultValue = "0") Integer from,
-            /*@Positive*/ @RequestParam(value = "size", defaultValue = "10") Integer size) {
+                                                   @RequestParam(value = "from", defaultValue = "0") Integer from,
+                                                   @RequestParam(value = "size", defaultValue = "10") Integer size) {
         final Sort sort = Sort.by("created").descending();
         final PageRequest page = PageRequest.of(from > 0 ? from / size : 0, size, sort);
         final List<ItemRequestDto> itemRequestDto = itemRequestDtoService.getAllItemRequests(userId, page);

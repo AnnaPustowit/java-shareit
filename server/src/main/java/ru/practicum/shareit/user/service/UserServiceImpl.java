@@ -17,7 +17,6 @@ import static ru.practicum.shareit.user.dto.UserMapper.toUser;
 import static ru.practicum.shareit.user.dto.UserMapper.toUserDto;
 
 @Service
-// @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
@@ -25,7 +24,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto createUser(UserDto userDto) {
-        //Long userId = userDto.getId();
         return toUserDto(userRepository.save(toUser(userDto)));
     }
 

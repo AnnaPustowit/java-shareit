@@ -4,8 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.validation.constraints.Email;
-
 import lombok.*;
 
 import javax.persistence.*;
@@ -29,5 +27,5 @@ public class User {
     @Column(name = "name")
     private String name;
     @Column(name = "email")
-    @Email String email;
+    String email;
 }

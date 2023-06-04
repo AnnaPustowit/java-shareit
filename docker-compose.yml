@@ -19,6 +19,7 @@ services:
     depends_on:
       - db
     environment:
+      - TZ=Europe/Moscow
       - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/shareit
       - POSTGRES_USER=root
       - POSTGRES_PASSWORD=root

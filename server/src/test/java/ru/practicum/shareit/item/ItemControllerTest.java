@@ -13,6 +13,7 @@ import ru.practicum.shareit.item.dto.CommentResponseDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemResponseDto;
 import ru.practicum.shareit.item.service.ItemService;
+import org.springframework.data.domain.Sort;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
@@ -99,7 +100,8 @@ class ItemControllerTest {
 
     @Test
     void getAllItems() throws Exception {
-        final PageRequest page = PageRequest.of(from > 0 ? from / size : 0, size);
+        Sort sort = Sort.by(Sort.Direction.ASC, "id");
+        final PageRequest page = PageRequest.of(from > 0 ? from / size : 0, size, sort);
 
         when(itemService.getAllItems(userId, page))
                 .thenReturn(Collections.emptyList());

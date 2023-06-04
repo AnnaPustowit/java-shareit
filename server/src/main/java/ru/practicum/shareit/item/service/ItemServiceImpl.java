@@ -30,7 +30,6 @@ import static ru.practicum.shareit.item.dto.ItemMapper.*;
 
 @Service
 @RequiredArgsConstructor
-// @Transactional(readOnly = true)
 public class ItemServiceImpl implements ItemService {
     private final ItemRepository itemRepository;
     private final UserRepository userRepository;
@@ -56,6 +55,7 @@ public class ItemServiceImpl implements ItemService {
     @Transactional
     @Override
     public ItemDto updateItem(Long userId, Long itemId, ItemDto itemDto) {
+        validateUser(userId);
         final Item itemUpdate = itemRepository.findById(itemId).orElseThrow(() -> new ValidateEntityException("Вещь с id : " + itemId + " не найдена."));
         if (!userId.equals(itemUpdate.getOwner().getId())) {
             throw new ValidateEntityException("Владелец вещи с id : " + userId + " указан не верно.");
@@ -72,6 +72,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public List<ItemResponseDto> getAllItems(Long userId, PageRequest page) {
+        validateUser(userId);
         final List<ItemResponseDto> itemsList = itemRepository.findAllByOwnerId(userId, page)
                 .map(ItemMapper::toItemResponseDto)
                 .getContent();
@@ -79,6 +80,7 @@ public class ItemServiceImpl implements ItemService {
                 .stream()
                 .map(ItemResponseDto::getId)
                 .collect(Collectors.toList());
+        final List<Comment> comments = commentRepository.findAll();
         final List<Booking> bookingList = bookingRepository.findAllByItemIdInAndStatusIs(itemsId, BookingStatus.APPROVED);
         return itemsList
                 .stream()
@@ -88,6 +90,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public ItemResponseDto getItemById(Long itemId, Long userId) {
+        validateUser(userId);//
         final Item item = itemRepository.findById(itemId)
                 .orElseThrow(() -> new ValidateEntityException("Вещь с id : " + itemId + " не найдена."));
         final List<CommentResponseDto> comments = commentRepository.findAllByItemId(itemId)
@@ -106,7 +109,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public List<ItemDto> searchItems(Long userId, String text, PageRequest page) {
-        if (text == null || text.isBlank()) return Collections.emptyList();//
+        if (text == null || text.isBlank()) return Collections.emptyList();
         validateUser(userId);
         return itemRepository.findAllByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCaseAndIsAvailableIsTrue(text, text, page)
                 .map(ItemMapper::toItemDto)

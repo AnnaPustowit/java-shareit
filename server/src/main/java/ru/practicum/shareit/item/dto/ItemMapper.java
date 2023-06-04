@@ -19,6 +19,7 @@ public class ItemMapper {
     }
 
     public static ItemResponseDto toItemResponseDto(Item item) {
-        return new ItemResponseDto(item.getId(), item.getName(), item.getDescription(), item.getIsAvailable(), item.getOwner(), item.getRequest() != null ? item.getRequest().getId() : null);
+        Long request = (item.getRequest() != null) ? item.getRequest().getId() : null;
+        return new ItemResponseDto(item.getId(), item.getName(), item.getDescription(), item.getIsAvailable(), item.getOwner(), request);
     }
 }

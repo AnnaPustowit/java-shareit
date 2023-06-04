@@ -3,6 +3,7 @@ package ru.practicum.shareit.item;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -38,7 +39,7 @@ public class ItemController {
 
     @PostMapping
     public ItemDto createItem(@RequestHeader("X-Sharer-User-Id") Long userId,
-            /*@Valid*/ @RequestBody ItemDto itemDto) {
+                              @RequestBody ItemDto itemDto) {
         ItemDto newItemDto = itemService.createItem(userId, itemDto);
         log.debug("Добавлена вещь с id : {}", newItemDto.getId());
         return newItemDto;
@@ -46,7 +47,7 @@ public class ItemController {
 
     @PatchMapping("/{itemId}")
     public ItemDto updateItem(@RequestHeader("X-Sharer-User-Id") Long userId,
-            /*@Valid*/ @PathVariable Long itemId,
+                              @PathVariable Long itemId,
                               @RequestBody ItemDto itemDto) {
         ItemDto newItemDto = itemService.updateItem(userId, itemId, itemDto);
         log.debug("Вещь с id : " + itemId + " обновлена.");
@@ -63,9 +64,10 @@ public class ItemController {
 
     @GetMapping
     public List<ItemResponseDto> getAllItems(@RequestHeader("X-Sharer-User-Id") Long userId,
-            /*@PositiveOrZero*/ @RequestParam(value = "from", defaultValue = "0") Integer from,
-            /*@Positive*/ @RequestParam(value = "size", defaultValue = "10") Integer size) {
-        final PageRequest page = PageRequest.of(from > 0 ? from / size : 0, size);
+                                             @RequestParam(value = "from", defaultValue = "0") Integer from,
+                                             @RequestParam(value = "size", defaultValue = "10") Integer size) {
+        Sort sort = Sort.by(Sort.Direction.ASC, "id");
+        final PageRequest page = PageRequest.of(from > 0 ? from / size : 0, size, sort);
         List<ItemResponseDto> allItems = itemService.getAllItems(userId, page);
         log.debug("Получен список всех вещей пользователя : {}", userId);
         return allItems;
@@ -74,8 +76,8 @@ public class ItemController {
     @GetMapping("/search")
     public List<ItemDto> searchItems(@RequestHeader("X-Sharer-User-Id") Long userId,
                                      @RequestParam(value = "text") String text,
-            /*@Valid @PositiveOrZero*/ @RequestParam(value = "from", defaultValue = "0") Integer from,
-            /*@Positive*/ @RequestParam(value = "size", defaultValue = "10") Integer size) {
+                                     @RequestParam(value = "from", defaultValue = "0") Integer from,
+                                     @RequestParam(value = "size", defaultValue = "10") Integer size) {
         final PageRequest page = PageRequest.of(from > 0 ? from / size : 0, size);
         final List<ItemDto> items = itemService.searchItems(userId, text, page);
         log.debug("Получен список вещей по ключевому слову : {}", text);
@@ -84,7 +86,7 @@ public class ItemController {
 
     @PostMapping("/{itemId}/comment")
     public CommentResponseDto createComment(@RequestHeader("X-Sharer-User-Id") Long userId,
-            /*@Valid*/ @RequestBody CommentDto commentDto,
+                                            @RequestBody CommentDto commentDto,
                                             @PathVariable Long itemId) {
         CommentResponseDto commentNew = itemService.createComment(userId, commentDto, itemId);
         log.debug("Добавлен новый отзыв для вещи : {}", itemId);

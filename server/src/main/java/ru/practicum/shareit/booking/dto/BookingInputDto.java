@@ -14,16 +14,7 @@ import java.time.LocalDateTime;
 @EqualsAndHashCode
 @ToString
 public class BookingInputDto {
-    //@NotNull
     private Long itemId;
-
-    //@NotNull
-    //@FutureOrPresent
-    //@JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime start;
-
-    //@NotNull
-    //@FutureOrPresent
-    //@JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime end;
 }

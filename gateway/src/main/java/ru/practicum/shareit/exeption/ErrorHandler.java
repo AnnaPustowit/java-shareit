@@ -20,9 +20,9 @@ public class ErrorHandler {
     }
 
     @ExceptionHandler
-    @ResponseStatus(HttpStatus.CONFLICT)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public Map<String, String> handleValidationException(final Throwable exception) {
-        log.error("Код ошибки: {}, {}", HttpStatus.CONFLICT, exception.getMessage());
+        log.error("Код ошибки: {}, {}", HttpStatus.INTERNAL_SERVER_ERROR, exception.getMessage());
         return Map.of("error", exception.getMessage());
     }
 }

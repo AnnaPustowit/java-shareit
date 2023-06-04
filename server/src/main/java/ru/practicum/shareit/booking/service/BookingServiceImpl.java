@@ -30,7 +30,6 @@ import static ru.practicum.shareit.booking.dto.BookingMapper.toBookingDto;
 
 @Service
 @RequiredArgsConstructor
-//@Transactional(readOnly = true)
 public class BookingServiceImpl implements BookingService {
     private final ItemRepository itemRepository;
     private final UserRepository userRepository;
@@ -55,7 +54,7 @@ public class BookingServiceImpl implements BookingService {
     @Override
     @Transactional
     public BookingDto updateBooking(Long bookingId, Long userId, boolean isApproved) {
-        final User user = validateUser(userId);
+        validateUser(userId);
         Booking booking = bookingRepository.findByIdAndItemOwnerId(bookingId, userId)
                 .orElseThrow(() -> new ValidateEntityException("Бронь с id : " + bookingId + " не найдена."));
         if (!booking.getStatus().equals(BookingStatus.WAITING))
@@ -69,7 +68,7 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public BookingDto getBookingById(Long userId, Long bookingId) {
-        final User user = validateUser(userId);
+        validateUser(userId);
         return toBookingDto(bookingRepository.findById(bookingId)
                 .filter(b -> Objects.equals(b.getBooker().getId(), userId) || Objects.equals(b.getItem().getOwner().getId(), userId))
                 .orElseThrow(() -> new ValidateEntityException("Бронирование вещи с id : " + bookingId + " не найдено.")));
@@ -77,8 +76,7 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public List<BookingDto> getAllBookingInfo(Long userId, String state, PageRequest page) {
-        final BookingState bookingState = BookingState.from(state)
-                .orElseThrow(() -> new NotFoundException("Unknown state: " + state));
+        final BookingState bookingState = BookingState.valueOf(state);//
         final User user = validateUser(userId);
         final LocalDateTime date = LocalDateTime.now();
         Page<Booking> bookings;
@@ -105,8 +103,7 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public List<BookingDto> getAllOwnerBookingInfo(Long userId, String state, PageRequest page) {
-        final BookingState bookingState = BookingState.from(state)
-                .orElseThrow(() -> new NotFoundException("Unknown state: " + state));
+        final BookingState bookingState = BookingState.valueOf(state);//
         final User user = validateUser(userId);
         final List<Long> itemIdList = itemRepository.findAllByOwnerId(userId)
                 .stream()
@@ -144,5 +141,3 @@ public class BookingServiceImpl implements BookingService {
                 .orElseThrow(() -> new ValidateEntityException("Пользователь с id : " + userId + " не найден."));
     }
 }
-
-
